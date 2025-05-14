@@ -2,7 +2,7 @@
 **Boost PostgreSQL Performance with Built-In Full Text Search for Fast, Accurate SQL Queries**
 
 **Abstract**  
-Looking to implement powerful search functionality without relying on external tools like Elasticsearch or Solr? PostgreSQL Full Text Search (FTS) offers a high-performance, fully integrated SQL search engine for natural-language text matching, advanced indexing, and relevance ranking—all inside your database. In this guide, we explore how to use PostgreSQL's `tsvector`, `tsquery`, language configurations, and ranking functions to build scalable, accurate, and efficient search queries. Perfect for developers and database architects building modern search-driven applications with PostgreSQL.
+Looking to implement powerful search functionality without relying on external tools like Elasticsearch or Solr? PostgreSQL Full Text Search (FTS) offers a high-performance, fully integrated SQL search engine for natural-language text matching, advanced indexing, and relevance ranking—all inside your database. In this guide, we explore how to use PostgreSQL's `tsvector`, `tsquery`, language configurations, and ranking functions to build scalable, accurate, and efficient search queries. Perfect for developers and database architects building modern search-driven applications with PostgreSQL. Together with the PostGres `pgvector` plugin you can create semantic search and keyword search, implement hybrid search, all where your data lives, and seamlessy integrate in a Retrieval Augmented Generation (RAG) application.
 
 
 ## **Introduction**
