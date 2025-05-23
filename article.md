@@ -30,7 +30,12 @@ PostgreSQL’s FTS solves these with tokenization, normalization, and indexed se
 - **Storage**: Documents are stored as **tsvectors** — sorted arrays of lexemes, optionally with position info to improve relevance ranking in dense query matches.
 
 # ---- COMMENT ----
-I think the above section would make more sende below under the tsvector part.
+I think the above section would make more sense below under the tsvector part.
+
+Also, a more in-depth description of what the below techniques build on would
+be very informative. Maybe could have a separate article on popular
+text-search methods — what they are, what they do under the hood and pros /
+cons of each, so we could link this there for more info.
 # ---- COMMENT END ----
 
 ## `tsvector` and `tsquery`: Core Data Types for Full Text Search
@@ -83,6 +88,11 @@ SELECT to_tsvector('text search') @@ to_tsquery('text <-> search');
 -- returns true
 ```
 
+# ---- COMMENT ----
+Nitpicky, but swapping the `to_tsvector()` terms rather than the `to_tsquery()`
+would make it more imminent what we are looking at.
+# ---- COMMENT END ----
+
 ```sql
 SELECT to_tsvector('text search') @@ to_tsquery('search <-> text');
 -- returns false
@@ -120,6 +130,8 @@ LIMIT 10;
 ```
 
 While these queries work, they’re inefficient for frequent use. To improve performance, create a GIN index:
+
+# ---- COMMENT: what's a GIN index? ----
 
 ```sql
 CREATE INDEX pgweb_idx ON pgweb USING GIN (to_tsvector('english', body));
@@ -162,6 +174,8 @@ PostgreSQL includes **text search configurations** for many languages, which con
 
 You can check available configurations with the `psql` command `\dF`.
 
+# ---- COMMENT: would be useful to include its output ----
+
 And specify one explicitly:
 
 ```sql
@@ -180,6 +194,16 @@ Sure! Here's a well-structured version suitable for a technical blog article, wi
 
 
 ## Core Functions for Full Text Search in PostgreSQL
+
+# ---- COMMENT ----
+I would restructure the article leading with the below section using just
+keywords, so that would be a quick reference style document.
+Then, again, splitting it into a longer version, this could be followed by the
+detailed guide. In the detailed part I would probably lead with the ranking
+algorithms and how they interact with search OR — probably a better option —
+make it a bit more explicit why using ranking with search is useful and how it
+could be used in a real life scenario.
+# ---- COMMENT END ----
 
 PostgreSQL offers a comprehensive toolkit for implementing full text search (FTS), from parsing documents to interpreting user queries. Below are the core functions involved, each serving a unique role in the search workflow.
 
@@ -360,6 +384,8 @@ In all examples below, assume a table `my_table` with the column `textsearch` of
 
 The `ts_rank` function is useful for general-purpose ranking based on term frequency. 
 The following query selects the top 10 most relevant documents for a search involving the terms *neutrino* or *dark matter*, using `ts_rank` to sort the results:
+
+# ---- COMMENT: maybe just add a comment that `,` performs a cross-join for those not from pg background ----
 
 ```sql
 SELECT title, ts_rank(textsearch, query) AS rank
