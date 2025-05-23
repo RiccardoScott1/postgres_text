@@ -29,6 +29,9 @@ PostgreSQL’s FTS solves these with tokenization, normalization, and indexed se
 
 - **Storage**: Documents are stored as **tsvectors** — sorted arrays of lexemes, optionally with position info to improve relevance ranking in dense query matches.
 
+# ---- COMMENT ----
+I think the above section would make more sende below under the tsvector part.
+# ---- COMMENT END ----
 
 ## `tsvector` and `tsquery`: Core Data Types for Full Text Search
 
