@@ -33,3 +33,18 @@ Slightly more storage: The column is stored physically, increasing disk usage.
 
 Harder to change logic: Changing how the tsvector is generated requires dropping and recreating the column.
 
+Weighted version:
+
+```sql
+ALTER TABLE imdb_movies
+ADD COLUMN textsearchable_index_col_weighted tsvector
+GENERATED ALWAYS AS (
+  setweight(to_tsvector('english', coalesce(series_title, '')), 'A') ||
+  setweight(to_tsvector('english', coalesce(overview, '')), 'B')
+) STORED;
+
+CREATE INDEX textsearch_idx_weighted 
+ON imdb_movies USING GIN (textsearchable_index_col_weighted);
+```
+
+
