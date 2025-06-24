@@ -48,3 +48,23 @@ ON imdb_movies USING GIN (textsearchable_index_col_weighted);
 ```
 
 
+
+```sql
+SELECT 
+  series_title, 
+  overview,
+  ts_rank(textsearchable_index_col_weighted, query) AS rank,
+  ts_rank('{0.1, 0.1, 1.0, 0.1}', textsearchable_index_col_weighted, query) AS rank_weights_inverted
+  --{0.1, 0.2, 0.4, 1.0} default weigths d,c,b,a
+FROM
+  imdb_movies, 
+  plainto_tsquery('fish') query
+WHERE query @@ textsearchable_index_col_weighted
+ORDER BY rank DESC
+LIMIT 10;
+```
+
+|series_title|overview|rank|rank_weights_inverted|
+|------------|--------|----|---------------------|
+|Big Fish|A frustrated son tries to determine the fact from fiction in his dying father's life.|0.6079271|0.06079271|
+|The Bourne Identity|A man is picked up by a fishing boat, bullet-riddled and suffering from amnesia, before racing to elude assassins and attempting to regain his memory.|0.24317084|0.6079271|
