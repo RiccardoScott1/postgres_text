@@ -22,6 +22,9 @@ fi
 # Load environment variables
 source .env
 
+# Data file path
+CSV_FILE_PATH="data/raw/imdb_top_1000.csv"
+
 # Database connection parameters
 DB_HOST="localhost"
 DB_PORT="5432"
@@ -36,8 +39,8 @@ if [ -z "$POSTGRES_DB" ] || [ -z "$POSTGRES_USER" ] || [ -z "$POSTGRES_PASSWORD"
 fi
 
 # Check if CSV file exists
-if [ ! -f "data/imdb_top_1000.csv" ]; then
-    echo "❌ Error: data/imdb_top_1000.csv not found"
+if [ ! -f "$CSV_FILE_PATH" ]; then
+    echo "❌ Error: $CSV_FILE_PATH not found"
     exit 1
 fi
 
@@ -82,7 +85,7 @@ CREATE TABLE imdb_movies (
 );
 
 -- Load data from CSV
-\COPY imdb_movies(poster_link, series_title, released_year, certificate, runtime, genre, imdb_rating, overview, meta_score, director, star1, star2, star3, star4, no_of_votes, gross) FROM 'data/imdb_top_1000.csv' WITH CSV HEADER;
+\COPY imdb_movies(poster_link, series_title, released_year, certificate, runtime, genre, imdb_rating, overview, meta_score, director, star1, star2, star3, star4, no_of_votes, gross) FROM '$CSV_FILE_PATH' WITH CSV HEADER;
 
 -- Show count of loaded records
 SELECT COUNT(*) as total_movies FROM imdb_movies;
