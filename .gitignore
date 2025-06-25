@@ -174,4 +174,5 @@ cython_debug/
 .pypirc
 
 # PostgreSQL data directory
-data/
+data/postgres/
+!data/imdb_top_1000.csv

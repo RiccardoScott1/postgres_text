@@ -1,5 +1,24 @@
 #!/bin/bash
 
+# Exit on any error
+set -e
+
+# Function to handle errors
+handle_error() {
+    echo "❌ Error occurred on line $1"
+    echo "❌ Data loading failed!"
+    exit 1
+}
+
+# Trap errors
+trap 'handle_error $LINENO' ERR
+
+# Check if .env file exists
+if [ ! -f .env ]; then
+    echo "❌ Error: .env file not found. Please copy .env.example to .env and configure it."
+    exit 1
+fi
+
 # Load environment variables
 source .env
 
@@ -10,10 +29,31 @@ DB_NAME="$POSTGRES_DB"
 DB_USER="$POSTGRES_USER"
 DB_PASSWORD="$POSTGRES_PASSWORD"
 
+# Validate required environment variables
+if [ -z "$POSTGRES_DB" ] || [ -z "$POSTGRES_USER" ] || [ -z "$POSTGRES_PASSWORD" ]; then
+    echo "❌ Error: Missing required environment variables (POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD)"
+    exit 1
+fi
+
+# Check if CSV file exists
+if [ ! -f "data/imdb_top_1000.csv" ]; then
+    echo "❌ Error: data/imdb_top_1000.csv not found"
+    exit 1
+fi
+
 # Export password for psql
 export PGPASSWORD="$DB_PASSWORD"
 
-echo "Creating IMDB movies table and loading data..."
+echo "🔄 Creating IMDB movies table and loading data..."
+
+# Test database connection
+echo "🔍 Testing database connection..."
+if ! psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -c '\q' >/dev/null 2>&1; then
+    echo "❌ Error: Cannot connect to database. Make sure PostgreSQL is running and credentials are correct."
+    exit 1
+fi
+
+echo "✅ Database connection successful"
 
 # SQL to create table and load data
 psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" << EOF
@@ -51,4 +91,14 @@ SELECT COUNT(*) as total_movies FROM imdb_movies;
 SELECT series_title, released_year, imdb_rating, director FROM imdb_movies LIMIT 5;
 EOF
 
-echo "Data loading completed!"
+# Check if the loading was successful
+RECORD_COUNT=$(psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM imdb_movies;" 2>/dev/null | tr -d ' ')
+
+if [ "$RECORD_COUNT" -eq 1000 ]; then
+    echo "✅ Data loading completed successfully! Loaded $RECORD_COUNT movies."
+elif [ "$RECORD_COUNT" -gt 0 ]; then
+    echo "⚠️  Data loading completed with warnings. Loaded $RECORD_COUNT movies (expected 1000)."
+else
+    echo "❌ Data loading failed! No records found in database."
+    exit 1
+fi
